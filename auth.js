@@ -111,6 +111,10 @@ router.post('/login', async (req, res) => {
 router.post('/forgot', async (req, res) => {
     const { email } = req.body;
 
+    if (!email) {
+        return res.status(400).json({ message: 'E-mail é obrigatório.' });
+    }
+
     try {
         const { data: user, error } = await supabase
             .from('users')
@@ -122,11 +126,10 @@ router.post('/forgot', async (req, res) => {
             return res.status(400).json({ message: 'Usuário não encontrado' });
         }
 
-        const token = crypto.randomBytes(32).toString('hex');
+        const token = uuidv4(); // Gera um UUID v4 como token
         const now = new Date();
         const expiresAt = new Date(now.getTime() + 15 * 60 * 1000); // Expira em 15 minutos
 
-        // Inserir o token e a data de expiração diretamente
         const { error: insertError } = await supabase
             .from('password_resets')
             .insert([{ email, token, created_at: now, expires_at: expiresAt }]);
@@ -134,6 +137,14 @@ router.post('/forgot', async (req, res) => {
         if (insertError) {
             throw insertError;
         }
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.EMAIL_PASSWORD
+            }
+        });
 
         const mailOptions = {
             from: process.env.EMAIL,
@@ -148,7 +159,7 @@ router.post('/forgot', async (req, res) => {
                     <a href="${process.env.FRONTEND_URL}/reset.html?token=${token}&email=${email}" style="background-color: #509e2f; color: #F5F3F4; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Redefinir Senha</a>
                     <p style="color: #999; margin-top: 20px;">Se você não solicitou esta alteração, por favor ignore este e-mail.</p>
                 </div>
-                `
+            `
         };
 
         transporter.sendMail(mailOptions, (err, info) => {
