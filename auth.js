@@ -262,5 +262,31 @@ router.get('/get-profile/:userId', async (req, res) => {
     }
 });
 
+// Endpoint para inserir ou atualizar informações do perfil
+router.post('/update-profile', async (req, res) => {
+    const { userId, name, email, cpf, telefone } = req.body;
+
+    // Verifica se todos os campos necessários estão presentes
+    if (!userId || !name || !email || !cpf || !telefone) {
+        return res.status(400).json({ error: 'Todos os campos são necessários.' });
+    }
+
+    try {
+        // Atualiza ou insere os dados na tabela profile_infos para o userId especificado
+        const { data, error } = await supabase
+            .from('users_info')
+            .upsert([{ id: userId, name, email, cpf, telefone }]);
+
+        if (error) {
+            throw error;
+        }
+
+        res.status(200).json({ message: 'Perfil atualizado com sucesso!', data });
+    } catch (err) {
+        console.error('Erro ao atualizar perfil:', err);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
+
 
 module.exports = router;
