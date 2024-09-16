@@ -139,7 +139,7 @@ router.post('/forgot', async (req, res) => {
             from: process.env.EMAIL,
             to: email,
             subject: 'Redefinição de Senha',
-            text: `Você solicitou a redefinição de senha da sua conta. Clique no link para redefinir: ${process.env.FRONTEND_URL}/reset.html?token=${token}&email=${email}`,
+            text: `Você solicitou a redefinição de senha da sua conta. Clique no link para redefinir: ${process.env.FRONTEND_URL}/token=${token}&email=${email}`,
             html: `
                 <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
                     <h2 style="color: #333;">Redefinição de Senha</h2>
