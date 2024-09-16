@@ -142,6 +142,7 @@ router.post('/forgot', async (req, res) => {
             text: `Você solicitou a redefinição de senha da sua conta. Clique no link para redefinir`,
             html: `
                 <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+                    <img src="https://pontogorillaback.vercel.app/nome_gorilla_white.png" alt="Logo" style="max-width: 100px; margin-bottom: 20px;">
                     <h2 style="color: #333;">Redefinição de Senha</h2>
                     <p style="color: #666;">Você solicitou a redefinição de senha da sua conta.</p>
                     <p style="color: #666;">Clique no botão abaixo para redefinir sua senha:</p>
