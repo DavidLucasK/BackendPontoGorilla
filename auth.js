@@ -138,14 +138,6 @@ router.post('/forgot', async (req, res) => {
             throw insertError;
         }
 
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL,
-                pass: process.env.EMAIL_PASSWORD
-            }
-        });
-
         const mailOptions = {
             from: process.env.EMAIL,
             to: email,
