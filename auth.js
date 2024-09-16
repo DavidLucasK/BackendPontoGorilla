@@ -17,15 +17,13 @@ const upload = multer({
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
-const emailAddress = process.env.EMAIL;
-const emailPass = process.env.EMAIL_PASSWORD;
 
 // Configura o transporte de e-mail
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: emailAddress,
-        pass: emailPass,
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
     },
 });
 
