@@ -66,6 +66,10 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email e senha são obrigatórios.' });
+    }
+
     try {
         // Buscar o usuário no banco de dados
         const { data: user, error } = await supabase
@@ -75,8 +79,9 @@ router.post('/login', async (req, res) => {
             .single();
 
         if (error) {
+            // Não encontrado
             if (error.code === 'PGRST116') {
-                return res.status(400).json({ message: `Senha incorreta para ${email} ou email não cadastrado` });
+                return res.status(400).json({ message: `Email não cadastrado` });
             }
             throw error;
         }
@@ -101,6 +106,7 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Erro no servidor' });
     }
 });
+
 
 
 module.exports = router;
