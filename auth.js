@@ -111,6 +111,9 @@ router.post('/login', async (req, res) => {
 router.post('/forgot', async (req, res) => {
     const { email } = req.body;
 
+    console.log('Email:', process.env.EMAIL)
+    console.log('Pass:', process.env.EMAIL_PASSWORD)
+
     try {
         const { data: user, error } = await supabase
             .from('users')
