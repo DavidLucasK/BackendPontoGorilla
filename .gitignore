@@ -1,0 +1,42 @@
+# Dependências do Node.js
+node_modules/
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Arquivos de build
+dist/
+build/
+
+# Logs
+*.log
+
+# Sistema de arquivos
+.DS_Store
+Thumbs.db
+
+# IDEs e editores
+.vscode/
+.idea/
+*.suo
+*.user
+*.swp
+*.swo
+
+# Arquivos específicos do frontend (se houver um diretório público)
+public/
+
+# Arquivos gerados por ferramentas
+*.cache/
+*.tmp/
+
+# Dependências do frontend (se houver)
+*.min.js
+*.bundle.js
+
+# Arquivos específicos de deployment
+.vercel/
