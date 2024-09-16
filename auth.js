@@ -141,7 +141,7 @@ router.post('/forgot', async (req, res) => {
             subject: 'Redefinição de Senha',
             text: `Você solicitou a redefinição de senha da sua conta. Clique no link para redefinir`,
             html: `
-                <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+                <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #343a40;">
                     <img src="https://rrwdhhqxjjtyrgdzdsgr.supabase.co/storage/v1/object/public/assets/nome_gorilla_white.png" alt="Logo" style="max-width: 100px; margin-bottom: 20px;">
                     <h2 style="color: #333;">Redefinição de Senha</h2>
                     <p style="color: #666;">Você solicitou a redefinição de senha da sua conta.</p>
