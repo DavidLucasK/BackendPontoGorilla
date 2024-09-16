@@ -142,7 +142,7 @@ router.post('/forgot', async (req, res) => {
             text: `Você solicitou a redefinição de senha da sua conta. Clique no link para redefinir`,
             html: `
                 <div style="font-family: Arial, sans-serif; background-color: #ffffff; padding: 20px;">
-                    <div style="max-width: 600px; margin: 0 auto; background-color: #343a40; padding: 20px; border-radius: 8px;">
+                    <div style="max-width: 600px; margin: 100px auto; background-color: #343a40; padding: 20px; border-radius: 8px; text-align: center;">
                         <img src="https://rrwdhhqxjjtyrgdzdsgr.supabase.co/storage/v1/object/public/assets/nome_gorilla_white.png" alt="Logo" style="max-width: 100px; margin-bottom: 20px;">
                         <h2 style="color: #ffffff;">Redefinição de Senha</h2>
                         <p style="color: #ffffff;">Você solicitou a redefinição de senha da sua conta.</p>
@@ -152,7 +152,8 @@ router.post('/forgot', async (req, res) => {
                     </div>
                 </div>
             `
-        };        
+        };
+               
 
         transporter.sendMail(mailOptions, (err, info) => {
             if (err) {
