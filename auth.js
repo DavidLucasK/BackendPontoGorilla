@@ -166,7 +166,7 @@ router.post('/forgot', async (req, res) => {
     }
 });
 
-// Endpoint para resetar a senha
+// Endpoint para redefinir a senha
 router.post('/reset', async (req, res) => {
     const { email, token, newPassword } = req.body;
 
@@ -191,7 +191,6 @@ router.post('/reset', async (req, res) => {
             .limit(1)
             .single();
 
-        // Verifica se houve erro na consulta ou se não encontrou o registro
         if (resetError || !resetRequest) {
             console.log('Dados retornados da consulta de redefinição de senha:', resetRequest);
             console.log('Erro na consulta de redefinição de senha:', resetError);
@@ -216,11 +215,15 @@ router.post('/reset', async (req, res) => {
         }
 
         // Remover o token após a redefinição da senha
-        await supabase
+        const { error: deleteError } = await supabase
             .from('password_resets')
             .delete()
             .eq('email', email)
             .eq('token', token);
+
+        if (deleteError) {
+            throw deleteError;
+        }
 
         res.status(200).json({ message: 'Senha redefinida com sucesso' });
     } catch (err) {
