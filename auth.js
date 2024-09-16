@@ -67,28 +67,32 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
+        // Buscar o usuário no banco de dados
         const { data: user, error } = await supabase
             .from('users')
             .select('*')
             .eq('email', email)
             .single();
 
-        if (error && error.code === 'PGRST116') {
-            return res.status(400).json({ message: `Senha incorreta para ${email} ou email não cadastrado` });
-        } else if (error) {
+        if (error) {
+            if (error.code === 'PGRST116') {
+                return res.status(400).json({ message: `Senha incorreta para ${email} ou email não cadastrado` });
+            }
             throw error;
         }
 
         if (!user) {
-            return res.status(400).json({ message: `Usuário ${user} não existe!` });
+            return res.status(400).json({ message: `Usuário ${email} não existe!` });
         }
 
+        // Comparar a senha fornecida com a armazenada
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
             return res.status(400).json({ message: `Senha incorreta.` });
         }
 
+        // Gerar o token JWT
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.json({ token, userId: user.id, message: 'Login bem-sucedido!' });
@@ -97,5 +101,6 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Erro no servidor' });
     }
 });
+
 
 module.exports = router;
