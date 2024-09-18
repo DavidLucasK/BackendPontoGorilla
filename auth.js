@@ -288,5 +288,31 @@ router.post('/update-profile', async (req, res) => {
     }
 });
 
+// Endpoint para pegar registros de pontos de um usuário
+router.get('/points/:id_user', async (req, res) => {
+    const { id_user } = req.params;
+
+    try {
+        // Busca os registros de pontos na tabela points_records com base no id_user
+        const { data, error } = await supabase
+            .from('points_records')
+            .select('*')
+            .eq('id_user', id_user);
+
+        if (error) {
+            throw error;
+        }
+
+        if (data.length === 0) {
+            return res.status(404).json({ message: 'Nenhum registro de pontos encontrado para este usuário.' });
+        }
+
+        res.status(200).json(data);
+    } catch (err) {
+        console.error('Erro ao buscar registros de pontos:', err);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
+
 
 module.exports = router;
