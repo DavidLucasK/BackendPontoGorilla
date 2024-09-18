@@ -314,6 +314,7 @@ router.get('/points/:userId', async (req, res) => {
     }
 });
 
+// Endpoint para pegar somente um unico registro
 router.get('/singlerecord/:recordId', async (req, res) => {
     const { recordId } = req.params; // Usar req.params para acessar recordId
 
@@ -338,5 +339,91 @@ router.get('/singlerecord/:recordId', async (req, res) => {
         res.status(500).json({ message: 'Erro no servidor' });
     }
 });
+
+// Endpoint para registro de ponto (inserir ou atualizar)
+router.post('/register-point', async (req, res) => {
+    const { userId, action, observation } = req.body;
+    const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    const currentTime = new Date().toLocaleTimeString('pt-BR', { hour12: false }); // HH:MM:SS format
+
+    try {
+        // Verifica se já existe um registro de ponto para o usuário e a data atual
+        const { data: existingRecord, error: selectError } = await supabase
+            .from('points_records')
+            .select('*')
+            .eq('id_user', userId)
+            .eq('date', currentDate)
+            .single();
+
+        if (selectError && selectError.code !== 'PGRST116') { // Código de erro 'not found' da Supabase
+            throw selectError;
+        }
+
+        if (existingRecord) {
+            // Se já existe um registro, faz o update de acordo com a ação
+            const updates = {};
+            if (action === 'checkin') {
+                updates.hour1 = currentTime;
+            } else if (action === 'lunchstart') {
+                updates.hour2 = currentTime;
+            } else if (action === 'lunchend') {
+                updates.hour3 = currentTime;
+            } else if (action === 'checkout') {
+                updates.hour4 = currentTime;
+            }
+
+            // Adiciona observação, se houver
+            if (observation) {
+                updates.obs = observation;
+            }
+
+            // Atualiza o registro existente
+            const { error: updateError } = await supabase
+                .from('points_records')
+                .update(updates)
+                .eq('id_user', userId)
+                .eq('date', currentDate);
+
+            if (updateError) {
+                throw updateError;
+            }
+
+            return res.status(200).json({ message: 'Registro de ponto atualizado com sucesso.' });
+        } else {
+            // Se não existe um registro para o dia, cria um novo
+            const newRecord = {
+                id_user: userId,
+                date: currentDate,
+                obs: observation || null
+            };
+
+            // Define a hora de acordo com a ação
+            if (action === 'checkin') {
+                newRecord.hour1 = currentTime;
+            } else if (action === 'lunchstart') {
+                newRecord.hour2 = currentTime;
+            } else if (action === 'lunchend') {
+                newRecord.hour3 = currentTime;
+            } else if (action === 'checkout') {
+                newRecord.hour4 = currentTime;
+            }
+
+            // Insere um novo registro
+            const { error: insertError } = await supabase
+                .from('points_records')
+                .insert([newRecord]);
+
+            if (insertError) {
+                throw insertError;
+            }
+
+            return res.status(201).json({ message: 'Novo registro de ponto criado com sucesso.' });
+        }
+    } catch (err) {
+        console.error('Erro ao registrar ponto:', err);
+        return res.status(500).json({ message: 'Erro no servidor ao registrar ponto.' });
+    }
+});
+
 
 module.exports = router;
