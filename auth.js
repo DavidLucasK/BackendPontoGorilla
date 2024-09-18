@@ -318,10 +318,6 @@ router.get('/singlerecord/:recordId', async (req, res) => {
     const { recordId } = req.query;
 
     try {
-        if (!recordId) {
-            return res.status(400).json({ message: 'Parâmetros recordId são necessários.' });
-        }
-
         // Busca o registro específico de pontos na tabela points_records com base no recordId e point
         const { data, error } = await supabase
             .from('points_records')
