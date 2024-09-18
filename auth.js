@@ -342,7 +342,7 @@ router.get('/singlerecord/:recordId', async (req, res) => {
 
 // Endpoint para registro de ponto (inserir ou atualizar)
 router.post('/register-point', async (req, res) => {
-    const { userId, action, observation } = req.body;
+    const { userId, action, observation } = req.body; // action: checkin, lunchstart, lunchend, checkout
     const currentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     const currentTime = new Date().toLocaleTimeString('pt-BR', { hour12: false }); // HH:MM:SS format
 
@@ -360,7 +360,21 @@ router.post('/register-point', async (req, res) => {
         }
 
         if (existingRecord) {
-            // Se já existe um registro, faz o update de acordo com a ação
+            // Verifica se o campo correspondente à ação já foi preenchido
+            if (action === 'checkin' && existingRecord.hour1) {
+                return res.status(400).json({ message: 'Check-in já registrado para hoje.' });
+            }
+            if (action === 'lunchstart' && existingRecord.hour2) {
+                return res.status(400).json({ message: 'Saída para almoço já registrada para hoje.' });
+            }
+            if (action === 'lunchend' && existingRecord.hour3) {
+                return res.status(400).json({ message: 'Retorno do almoço já registrado para hoje.' });
+            }
+            if (action === 'checkout' && existingRecord.hour4) {
+                return res.status(400).json({ message: 'Check-out já registrado para hoje.' });
+            }
+
+            // Se não estiver preenchido, faz o update de acordo com a ação
             const updates = {};
             if (action === 'checkin') {
                 updates.hour1 = currentTime;
@@ -424,6 +438,7 @@ router.post('/register-point', async (req, res) => {
         return res.status(500).json({ message: 'Erro no servidor ao registrar ponto.' });
     }
 });
+
 
 
 module.exports = router;
