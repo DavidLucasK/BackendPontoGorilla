@@ -340,7 +340,7 @@ router.get('/singlerecord/:recordId', async (req, res) => {
     }
 });
 
-// Endpoint para registro de ponto (inserir ou atualizar)
+// Endpoint para registrar ponto
 router.post('/register-point', async (req, res) => {
     const { userId, date, hour1, hour2, hour3, hour4, obs } = req.body;
 
@@ -358,10 +358,18 @@ router.post('/register-point', async (req, res) => {
         }
 
         if (existingRecord) {
-            // Atualiza o registro existente com os horários fornecidos
+            // Atualiza o registro existente com os horários fornecidos, preservando valores não nulos
+            const updatedRecord = {
+                hour1: hour1 || existingRecord.hour1,
+                hour2: hour2 || existingRecord.hour2,
+                hour3: hour3 || existingRecord.hour3,
+                hour4: hour4 || existingRecord.hour4,
+                obs: obs !== undefined ? obs : existingRecord.obs,
+            };
+
             const { error: updateError } = await supabase
                 .from('points_records')
-                .update({ hour1, hour2, hour3, hour4, obs })
+                .update(updatedRecord)
                 .eq('id', existingRecord.id);
 
             if (updateError) {
