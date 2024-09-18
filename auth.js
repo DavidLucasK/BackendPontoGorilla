@@ -289,15 +289,15 @@ router.post('/update-profile', async (req, res) => {
 });
 
 // Endpoint para pegar registros de pontos de um usuário
-router.get('/points/:id_user', async (req, res) => {
-    const { id_user } = req.params;
+router.get('/points/:userId', async (req, res) => {
+    const { userId } = req.params;
 
     try {
-        // Busca os registros de pontos na tabela points_records com base no id_user
+        // Busca os registros de pontos na tabela points_records com base no userId
         const { data, error } = await supabase
             .from('points_records')
             .select('*')
-            .eq('id_user', id_user);
+            .eq('id_user', userId);
 
         if (error) {
             throw error;
