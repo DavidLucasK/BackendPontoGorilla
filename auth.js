@@ -314,5 +314,36 @@ router.get('/points/:userId', async (req, res) => {
     }
 });
 
+router.get('/points/:recordId', async (req, res) => {
+    const { recordId } = req.query;
+
+    try {
+        if (!recordId) {
+            return res.status(400).json({ message: 'Parâmetros recordId são necessários.' });
+        }
+
+        // Busca o registro específico de pontos na tabela points_records com base no recordId e point
+        const { data, error } = await supabase
+            .from('points_records')
+            .select('*')
+            .eq('id', recordId) // Considera-se que a coluna para o ID do registro é 'id'
+            .single(); // Espera-se um único registro
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data) {
+            return res.status(404).json({ message: 'Registro de pontos não encontrado.' });
+        }
+
+        res.status(200).json(data);
+    } catch (err) {
+        console.error('Erro ao buscar registro de pontos:', err);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
+
+
 
 module.exports = router;
