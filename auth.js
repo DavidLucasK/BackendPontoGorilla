@@ -314,7 +314,7 @@ router.get('/points/:userId', async (req, res) => {
     }
 });
 
-router.get('/points/:recordId', async (req, res) => {
+router.get('/singlerecord/:recordId', async (req, res) => {
     const { recordId } = req.query;
 
     try {
