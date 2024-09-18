@@ -315,20 +315,20 @@ router.get('/points/:userId', async (req, res) => {
 });
 
 router.get('/singlerecord/:recordId', async (req, res) => {
-    const { recordId } = req.query;
+    const { recordId } = req.params; // Usar req.params para acessar recordId
 
     try {
-        // Busca o registro específico de pontos na tabela points_records com base no recordId e point
+        // Busca o registro específico de pontos na tabela points_records com base no recordId
         const { data, error } = await supabase
             .from('points_records')
             .select('*')
-            .eq('id', recordId) // Considera-se que a coluna para o ID do registro é 'id'
+            .eq('id', recordId); // Considera-se que a coluna para o ID do registro é 'id'
 
         if (error) {
             throw error;
         }
 
-        if (!data) {
+        if (!data || data.length === 0) {
             return res.status(404).json({ message: 'Registro de pontos não encontrado.' });
         }
 
@@ -338,7 +338,5 @@ router.get('/singlerecord/:recordId', async (req, res) => {
         res.status(500).json({ message: 'Erro no servidor' });
     }
 });
-
-
 
 module.exports = router;
