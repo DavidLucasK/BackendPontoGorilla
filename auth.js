@@ -327,7 +327,6 @@ router.get('/points/:recordId', async (req, res) => {
             .from('points_records')
             .select('*')
             .eq('id', recordId) // Considera-se que a coluna para o ID do registro é 'id'
-            .single(); // Espera-se um único registro
 
         if (error) {
             throw error;
