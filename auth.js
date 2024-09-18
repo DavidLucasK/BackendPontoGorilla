@@ -350,27 +350,29 @@ router.post('/register-point', async (req, res) => {
             .from('points_records')
             .select('*')
             .eq('id_user', userId)
-            .eq('date', date)
-            .single();
+            .eq('date', date);
 
         if (fetchError) {
             throw fetchError;
         }
 
-        if (existingRecord) {
+        if (existingRecord.length > 0) {
+            // Há registros existentes, seleciona o primeiro (deve haver no máximo um)
+            const recordId = existingRecord[0].id;
+
             // Atualiza o registro existente com os horários fornecidos, preservando valores não nulos
             const updatedRecord = {
-                hour1: hour1 || existingRecord.hour1,
-                hour2: hour2 || existingRecord.hour2,
-                hour3: hour3 || existingRecord.hour3,
-                hour4: hour4 || existingRecord.hour4,
-                obs: obs !== undefined ? obs : existingRecord.obs,
+                hour1: hour1 || existingRecord[0].hour1,
+                hour2: hour2 || existingRecord[0].hour2,
+                hour3: hour3 || existingRecord[0].hour3,
+                hour4: hour4 || existingRecord[0].hour4,
+                obs: obs !== undefined ? obs : existingRecord[0].obs,
             };
 
             const { error: updateError } = await supabase
                 .from('points_records')
                 .update(updatedRecord)
-                .eq('id', existingRecord.id);
+                .eq('id', recordId);
 
             if (updateError) {
                 throw updateError;
@@ -378,7 +380,7 @@ router.post('/register-point', async (req, res) => {
 
             res.status(200).json({ success: true, message: 'Registro atualizado com sucesso!' });
         } else {
-            // Insere um novo registro
+            // Não há registros existentes, insere um novo
             const { error: insertError } = await supabase
                 .from('points_records')
                 .insert([{ id_user: userId, date, hour1, hour2, hour3, hour4, obs }]);
@@ -394,7 +396,5 @@ router.post('/register-point', async (req, res) => {
         res.status(500).json({ success: false, message: 'Erro no servidor' });
     }
 });
-
-
 
 module.exports = router;
