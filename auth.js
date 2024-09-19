@@ -380,7 +380,7 @@ router.post('/register-point', async (req, res) => {
             // Verifica se todos os campos de hora estão preenchidos
             if (existingRecord.hour1 && existingRecord.hour2 && existingRecord.hour3 && existingRecord.hour4) {
                 // Todos os campos estão preenchidos
-                return res.status(400).json({ success: false, message: 'Todos os horários já estão preenchidos para esta data.' });
+                return res.status(205).json({ success: false, message: 'Todos os horários já estão preenchidos para esta data.' });
             }
 
             // Atualiza o registro existente com os horários fornecidos, preservando valores não nulos
