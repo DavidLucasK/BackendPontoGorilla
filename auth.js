@@ -346,7 +346,7 @@ router.post('/register-point', async (req, res) => {
 
     try {
         // Verifica se já existe um registro para o usuário e a data fornecida
-        const { data: existingRecord, error: fetchError } = await supabase
+        const { data: existingRecords, error: fetchError } = await supabase
             .from('points_records')
             .select('*')
             .eq('id_user', userId)
@@ -356,29 +356,36 @@ router.post('/register-point', async (req, res) => {
             throw fetchError;
         }
 
-        if (existingRecord.length > 0) {
+        // Verifica se há registros existentes
+        if (existingRecords.length > 0) {
             // Há registros existentes, seleciona o primeiro (deve haver no máximo um)
-            const recordId = existingRecord[0].id;
+            const existingRecord = existingRecords[0];
+            
+            // Verifica se todos os campos de hora estão preenchidos
+            if (existingRecord.hour1 && existingRecord.hour2 && existingRecord.hour3 && existingRecord.hour4) {
+                // Todos os campos estão preenchidos
+                return res.status(400).json({ success: false, message: 'Todos os horários já estão preenchidos para esta data.' });
+            }
 
             // Atualiza o registro existente com os horários fornecidos, preservando valores não nulos
             const updatedRecord = {
-                hour1: hour1 || existingRecord[0].hour1,
-                hour2: hour2 || existingRecord[0].hour2,
-                hour3: hour3 || existingRecord[0].hour3,
-                hour4: hour4 || existingRecord[0].hour4,
-                obs: obs !== undefined ? obs : existingRecord[0].obs,
+                hour1: hour1 || existingRecord.hour1,
+                hour2: hour2 || existingRecord.hour2,
+                hour3: hour3 || existingRecord.hour3,
+                hour4: hour4 || existingRecord.hour4,
+                obs: obs !== undefined ? obs : existingRecord.obs,
             };
 
             const { error: updateError } = await supabase
                 .from('points_records')
                 .update(updatedRecord)
-                .eq('id', recordId);
+                .eq('id', existingRecord.id);
 
             if (updateError) {
                 throw updateError;
             }
 
-            res.status(200).json({ success: true, message: 'Registro atualizado com sucesso!' });
+            return res.status(200).json({ success: true, message: 'Registro atualizado com sucesso!' });
         } else {
             // Não há registros existentes, insere um novo
             const { error: insertError } = await supabase
@@ -389,7 +396,7 @@ router.post('/register-point', async (req, res) => {
                 throw insertError;
             }
 
-            res.status(201).json({ success: true, message: 'Registro inserido com sucesso!' });
+            return res.status(201).json({ success: true, message: 'Registro inserido com sucesso!' });
         }
     } catch (err) {
         console.error('Erro ao registrar ponto:', err);
