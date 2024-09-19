@@ -352,7 +352,7 @@ router.get('/singlerecord/:recordId', async (req, res) => {
 
 // Endpoint para registrar ponto
 router.post('/register-point', async (req, res) => {
-    const { userId, date, hour1, hour2, hour3, hour4, obs } = req.body;
+    const { userId, date, hour1, hour2, hour3, hour4, obs, geoloc } = req.body;
 
     // Ajusta as horas subtraindo 3 horas
     const adjustedHour1 = adjustHour(hour1);
@@ -406,7 +406,7 @@ router.post('/register-point', async (req, res) => {
             // Não há registros existentes, insere um novo
             const { error: insertError } = await supabase
                 .from('points_records')
-                .insert([{ id_user: userId, date: date, hour1: adjustedHour1, hour2: adjustedHour2, hour3: adjustedHour3, hour4: adjustedHour4, obs }]);
+                .insert([{ id_user: userId, date: date, hour1: adjustedHour1, hour2: adjustedHour2, hour3: adjustedHour3, hour4: adjustedHour4, obs, geoloc: geoloc }]);
 
             if (insertError) {
                 throw insertError;
