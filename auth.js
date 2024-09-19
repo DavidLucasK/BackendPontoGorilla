@@ -27,6 +27,16 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+// Função para ajustar o horário subtraindo 3 horas
+const adjustHour = (hour) => {
+    if (!hour) return null;
+    const [hours, minutes, seconds] = hour.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes, seconds);
+    date.setHours(date.getHours() - 3); // Subtrai 3 horas
+    return date.toTimeString().split(' ')[0].substring(0, 8); // Retorna no formato HH:mm:ss
+};
+
 // Endpoint para registro
 router.post('/register', async (req, res) => {
     const { email, password } = req.body;
@@ -344,6 +354,12 @@ router.get('/singlerecord/:recordId', async (req, res) => {
 router.post('/register-point', async (req, res) => {
     const { userId, date, hour1, hour2, hour3, hour4, obs } = req.body;
 
+    // Ajusta as horas subtraindo 3 horas
+    const adjustedHour1 = adjustHour(hour1);
+    const adjustedHour2 = adjustHour(hour2);
+    const adjustedHour3 = adjustHour(hour3);
+    const adjustedHour4 = adjustHour(hour4);
+
     try {
         // Verifica se já existe um registro para o usuário e a data fornecida
         const { data: existingRecords, error: fetchError } = await supabase
@@ -369,10 +385,10 @@ router.post('/register-point', async (req, res) => {
 
             // Atualiza o registro existente com os horários fornecidos, preservando valores não nulos
             const updatedRecord = {
-                hour1: hour1 || existingRecord.hour1,
-                hour2: hour2 || existingRecord.hour2,
-                hour3: hour3 || existingRecord.hour3,
-                hour4: hour4 || existingRecord.hour4,
+                hour1: adjustedHour1 || existingRecord.hour1,
+                hour2: adjustedHour2 || existingRecord.hour2,
+                hour3: adjustedHour3 || existingRecord.hour3,
+                hour4: adjustedHour4 || existingRecord.hour4,
                 obs: obs !== undefined ? obs : existingRecord.obs,
             };
 
@@ -390,7 +406,7 @@ router.post('/register-point', async (req, res) => {
             // Não há registros existentes, insere um novo
             const { error: insertError } = await supabase
                 .from('points_records')
-                .insert([{ id_user: userId, date, hour1, hour2, hour3, hour4, obs }]);
+                .insert([{ id_user: userId, date, hour1: adjustedHour1, hour2: adjustedHour2, hour3: adjustedHour3, hour4: adjustedHour4, obs }]);
 
             if (insertError) {
                 throw insertError;
