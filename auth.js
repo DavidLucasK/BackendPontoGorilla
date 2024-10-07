@@ -278,7 +278,7 @@ router.get('all_users', async (req, res) => {
         // Busca os dados na tabela profile_infos com base no userId
         const { data, error } = await supabase
             .from('users_info')
-            .select('id, name, email, cpf')
+            .select('*')
 
         if (error) {
             throw error;
