@@ -272,8 +272,8 @@ router.get('/get_role/:userId', async (req, res) => {
     }
 });
 
-//Endpoint para pegar todos os funcionários da empresa
-router.get('all_users', async (req, res) => {
+// Endpoint para pegar todos os usuários da tabela users_info
+router.get('/all_users', async (req, res) => {
     try {
         // Busca os dados na tabela profile_infos com base no userId
         const { data, error } = await supabase
@@ -284,8 +284,8 @@ router.get('all_users', async (req, res) => {
             throw error;
         }
 
-        if (!data) {
-            return res.status(404).json({ message: 'Perfil não encontrado.' });
+        if (!data || data.length === 0) {
+            return res.status(404).json({ message: 'Nenhum usuário encontrado.' });
         }
 
         res.status(200).json(data);
