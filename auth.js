@@ -272,6 +272,29 @@ router.get('/get_role/:userId', async (req, res) => {
     }
 });
 
+//Endpoint para pegar todos os funcionários da empresa
+router.get('all_users', async (req, res) => {
+    try {
+        // Busca os dados na tabela profile_infos com base no userId
+        const { data, error } = await supabase
+            .from('users_info')
+            .select('id, name, email, cpf')
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data) {
+            return res.status(404).json({ message: 'Perfil não encontrado.' });
+        }
+
+        res.status(200).json(data);
+    } catch (err) {
+        console.error('Erro ao buscar perfil:', err);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+})
+
 // Endpoint para pegar infos do usuario com base no userId
 router.get('/get-profile/:userId', async (req, res) => {
     const { userId } = req.params;
